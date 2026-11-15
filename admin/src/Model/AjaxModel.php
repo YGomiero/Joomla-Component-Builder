@@ -234,12 +234,17 @@ class AjaxModel extends ListModel
 			$cacheKey = $githubUrl;
 			if (($page = SessionHelper::get($cacheKey, 'not_found')) === 'not_found')
 			{
-				// Restrict fallback to supported languages in the official documentation.
-				$englishUrl = preg_replace(
-					'~^(https://raw\\.githubusercontent\\.com/joomengine/jcb-documentation/refs/heads/master/)(?:french|persian)/~',
-					'${1}english/',
-					$githubUrl
-				);
+				// Reuse the path validator for the English document in the official repository.
+				$englishUrl = $githubUrl;
+				$segments = explode('.', trim($path));
+				if (
+					count($segments) >= 7
+					&& array_slice($segments, 0, 5) === ['joomengine', 'jcb-documentation', 'refs', 'heads', 'master']
+					&& $segments[5] !== 'english'
+				) {
+					$segments[5] = 'english';
+					$englishUrl = $this->toRawJcbDocGithubMarkdownUrl(implode('.', $segments));
+				}
 				try {
 					$page = FileHelper::getContent($githubUrl);
 				} catch (\Throwable $e) {

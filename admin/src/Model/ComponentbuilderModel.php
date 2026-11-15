@@ -593,7 +593,8 @@ class ComponentbuilderModel extends ListModel
 	public function getJcbDocGitHubMd()
 	{
 		// call the ajax get wiki endpoint
-		$language = strtolower(explode('-', Factory::getApplication()->getLanguage()->getTag())[0]);
+		$app = $this->app ?? Factory::getApplication();
+		$language = strtolower(explode('-', $app->getLanguage()->getTag())[0]);
 		$directory = match ($language) {
 			'fr' => 'french',
 			'fa' => 'persian',
@@ -603,7 +604,7 @@ class ComponentbuilderModel extends ListModel
 		$call_url = Uri::base() . 'index.php?option=com_componentbuilder&task=ajax.getJcbDocGitHubMd&format=json&raw=true&' . Session::getFormToken() . '=1&path=' . $path;
 
 		/** \Joomla\CMS\WebAsset\WebAssetManager $wa */
-		$wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+		$wa = $app->getDocument()->getWebAssetManager();
 		$wa->addInlineScript('
 		function getJcbDocGitHubMd(){
 			fetch("' . $call_url . '").then((response) => {
